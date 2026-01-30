@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Dreidel Timer</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --accent: #e2b04a;
+    --accent2: #c8961e;
+    --text: #eee;
+    --text-dim: #8a8a9a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    margin-top: max(env(safe-area-inset-top, 12px), 12px);
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- Timer Display ---- */
+  #timer-display {
+    font-size: 3.2rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    margin: 8px 0 4px;
+    letter-spacing: 0.04em;
+    min-height: 3.8rem;
+  }
+
+  /* ---- Dreidel Scene ---- */
+  #scene {
+    width: 220px;
+    height: 320px;
+    perspective: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  #dreidel-pivot {
+    transform-style: preserve-3d;
+    transition: transform 1.2s cubic-bezier(.4, 0, .2, 1);
+  }
+
+  #dreidel-pivot.fallen {
+    transform: rotateZ(95deg) translateY(60px) translateX(30px);
+  }
+
+  #dreidel-group {
+    transform-style: preserve-3d;
+    animation: none;
+  }
+
+  #dreidel-group.spinning {
+    animation: spin 0.7s linear infinite;
+  }
+
+  #dreidel-group.slowing {
+    animation: spin 2s cubic-bezier(.4, .0, .8, 1) forwards;
+  }
+
+  @keyframes spin {
+    from { transform: rotateY(0deg); }
+    to   { transform: rotateY(360deg); }
+  }
+
+  /* 3D dreidel built with CSS */
+  .dreidel-3d {
+    transform-style: preserve-3d;
+    position: relative;
+    width: 100px;
+    height: 240px;
+  }
+
+  /* --- Handle (top cylinder approximated as box) --- */
+  .handle {
+    position: absolute;
+    width: 18px;
+    height: 50px;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transform-style: preserve-3d;
+  }
+  .handle .face {
+    position: absolute;
+    background: linear-gradient(180deg, #d4a84b, #b8872a);
+    border: 1px solid #9a6f1a;
+  }
+  .handle .front  { width: 18px; height: 50px; transform: translateZ(9px); }
+  .handle .back   { width: 18px; height: 50px; transform: translateZ(-9px) rotateY(180deg); }
+  .handle .left   { width: 18px; height: 50px; left: -9px; transform: translateX(9px) rotateY(-90deg); }
+  .handle .right  { width: 18px; height: 50px; left: 9px;  transform: translateX(-9px) rotateY(90deg); }
+  .handle .top    { width: 18px; height: 18px; top: -1px;  transform: rotateX(90deg) translateZ(0px); background: linear-gradient(135deg, #e2c06a, #c8961e); border-radius: 3px; }
+
+  /* --- Body (cube) --- */
+  .body {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 50px;
+    left: 0;
+    transform-style: preserve-3d;
+  }
+  .body .face {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #1a1040;
+    border: 1.5px solid #9a6f1a;
+    background: linear-gradient(160deg, #e8c965, #c89520);
+    backface-visibility: visible;
+  }
+  .body .front  { transform: translateZ(50px); }
+  .body .back   { transform: translateZ(-50px) rotateY(180deg); }
+  .body .left   { transform: translateX(-50px) rotateY(-90deg); }
+  .body .right  { transform: translateX(50px) rotateY(90deg); }
+  .body .top    { height: 100px; transform: translateY(-50px) rotateX(90deg); background: linear-gradient(135deg, #edd87a, #c8961e); font-size: 0; }
+  .body .bottom { height: 100px; transform: translateY(50px) rotateX(-90deg); background: linear-gradient(135deg, #b88520, #9a6f1a); font-size: 0; }
+
+  /* Hebrew letters on each face — נ (Nun), ג (Gimel), ה (Hey), ש (Shin) */
+  .body .front::after  { content: "נ"; }
+  .body .right::after  { content: "ג"; }
+  .body .back::after   { content: "ה"; }
+  .body .left::after   { content: "ש"; }
+
+  /* --- Point (pyramid bottom) --- */
+  .point {
+    position: absolute;
+    width: 100px;
+    height: 90px;
+    top: 150px;
+    left: 0;
+    transform-style: preserve-3d;
+  }
+
+  .point .tri {
+    position: absolute;
+    width: 0; height: 0;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-top: 90px solid #c89520;
+    transform-origin: top center;
+  }
+
+  .point .tri-front {
+    transform: translateZ(50px) translateX(0px);
+    border-top-color: #d4a84b;
+  }
+  .point .tri-back {
+    transform: translateZ(-50px) rotateY(180deg);
+    border-top-color: #b08018;
+  }
+  .point .tri-left {
+    left: 0;
+    transform: translateX(-50px) rotateY(-90deg) translateX(50px);
+    transform-origin: top left;
+    border-top-color: #c89520;
+  }
+  .point .tri-right {
+    right: 0;
+    transform: translateX(50px) rotateY(90deg) translateX(-50px);
+    transform-origin: top right;
+    border-top-color: #ba8c1e;
+  }
+
+  /* ---- Shadow ---- */
+  #shadow {
+    width: 100px;
+    height: 20px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%);
+    border-radius: 50%;
+    margin-top: -10px;
+    transition: all 1.2s ease;
+  }
+  #shadow.fallen {
+    width: 160px;
+    transform: translateX(30px);
+    opacity: 0.5;
+  }
+
+  /* ---- Controls ---- */
+  #controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0 24px;
+    max-width: 380px;
+  }
+
+  .preset-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .preset-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .preset-btn:active, .preset-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .custom-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .custom-row label { color: var(--text-dim); font-size: 0.85rem; }
+
+  .time-input {
+    width: 52px;
+    padding: 6px 4px;
+    border-radius: 10px;
+    border: 2px solid var(--accent2);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.05rem;
+    text-align: center;
+    -webkit-appearance: none;
+  }
+
+  #start-btn {
+    width: 100%;
+    max-width: 260px;
+    padding: 14px;
+    border: none;
+    border-radius: 28px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--bg);
+    letter-spacing: 0.04em;
+    transition: opacity 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #start-btn:active { opacity: 0.8; }
+  #start-btn.cancel { background: #c0392b; color: #fff; }
+
+  /* ---- Finished banner ---- */
+  #finished-banner {
+    display: none;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    animation: pulse 0.6s ease-in-out infinite alternate;
+  }
+  #finished-banner.show { display: block; }
+  @keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
+
+  /* Layout spacing helper */
+  .spacer { flex: 1; min-height: 4px; max-height: 24px; }
+</style>
+</head>
+<body>
+
+<h1>Dreidel Timer</h1>
+
+<div id="timer-display">0:00</div>
+
+<div id="scene">
+  <div id="dreidel-pivot">
+    <div id="dreidel-group">
+      <div class="dreidel-3d">
+        <!-- Handle -->
+        <div class="handle">
+          <div class="face front"></div>
+          <div class="face back"></div>
+          <div class="face left"></div>
+          <div class="face right"></div>
+          <div class="face top"></div>
+        </div>
+        <!-- Body -->
+        <div class="body">
+          <div class="face front"></div>
+          <div class="face back"></div>
+          <div class="face left"></div>
+          <div class="face right"></div>
+          <div class="face top"></div>
+          <div class="face bottom"></div>
+        </div>
+        <!-- Point -->
+        <div class="point">
+          <div class="tri tri-front"></div>
+          <div class="tri tri-back"></div>
+          <div class="tri tri-left"></div>
+          <div class="tri tri-right"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="shadow"></div>
+
+<div id="finished-banner">Time's Up!</div>
+
+<div class="spacer"></div>
+
+<div id="controls">
+  <div class="preset-row">
+    <button class="preset-btn" data-sec="30">0:30</button>
+    <button class="preset-btn active" data-sec="60">1:00</button>
+    <button class="preset-btn" data-sec="120">2:00</button>
+    <button class="preset-btn" data-sec="300">5:00</button>
+    <button class="preset-btn" data-sec="600">10:00</button>
+  </div>
+  <div class="custom-row">
+    <label>Custom:</label>
+    <input class="time-input" id="input-min" type="number" min="0" max="99" value="1" inputmode="numeric" aria-label="Minutes">
+    <label>m</label>
+    <input class="time-input" id="input-sec" type="number" min="0" max="59" value="0" inputmode="numeric" aria-label="Seconds">
+    <label>s</label>
+  </div>
+  <button id="start-btn">Start</button>
+</div>
+
+<div class="spacer"></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const display  = $('timer-display');
+  const group    = $('dreidel-group');
+  const pivot    = $('dreidel-pivot');
+  const shadow   = $('shadow');
+  const startBtn = $('start-btn');
+  const banner   = $('finished-banner');
+  const inputMin = $('input-min');
+  const inputSec = $('input-sec');
+  const presets  = document.querySelectorAll('.preset-btn');
+
+  let totalSeconds = 60;
+  let remaining = 0;
+  let interval = null;
+  let running = false;
+
+  function fmt(s) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return m + ':' + String(sec).padStart(2, '0');
+  }
+
+  function syncInputs() {
+    inputMin.value = Math.floor(totalSeconds / 60);
+    inputSec.value = totalSeconds % 60;
+  }
+
+  function readInputs() {
+    const m = Math.max(0, parseInt(inputMin.value) || 0);
+    const s = Math.max(0, Math.min(59, parseInt(inputSec.value) || 0));
+    totalSeconds = m * 60 + s;
+    if (totalSeconds < 1) totalSeconds = 1;
+    // deselect presets
+    presets.forEach(b => b.classList.remove('active'));
+  }
+
+  // Preset buttons
+  presets.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (running) return;
+      presets.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      totalSeconds = parseInt(btn.dataset.sec);
+      syncInputs();
+      display.textContent = fmt(totalSeconds);
+    });
+  });
+
+  // Custom input changes
+  inputMin.addEventListener('change', () => { if (!running) { readInputs(); display.textContent = fmt(totalSeconds); } });
+  inputSec.addEventListener('change', () => { if (!running) { readInputs(); display.textContent = fmt(totalSeconds); } });
+
+  function reset() {
+    clearInterval(interval);
+    interval = null;
+    running = false;
+    group.classList.remove('spinning', 'slowing');
+    pivot.classList.remove('fallen');
+    shadow.classList.remove('fallen');
+    banner.classList.remove('show');
+    startBtn.textContent = 'Start';
+    startBtn.classList.remove('cancel');
+    display.textContent = fmt(totalSeconds);
+  }
+
+  function finish() {
+    clearInterval(interval);
+    interval = null;
+    running = false;
+    display.textContent = '0:00';
+
+    // Slow-down then fall
+    group.classList.remove('spinning');
+    group.classList.add('slowing');
+
+    setTimeout(() => {
+      group.classList.remove('slowing');
+      pivot.classList.add('fallen');
+      shadow.classList.add('fallen');
+      banner.classList.add('show');
+      startBtn.textContent = 'Reset';
+      startBtn.classList.remove('cancel');
+
+      // Vibrate if available
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+    }, 1600);
+  }
+
+  function start() {
+    readInputs();
+    remaining = totalSeconds;
+    display.textContent = fmt(remaining);
+    running = true;
+    banner.classList.remove('show');
+    pivot.classList.remove('fallen');
+    shadow.classList.remove('fallen');
+    group.classList.remove('slowing');
+    group.classList.add('spinning');
+    startBtn.textContent = 'Cancel';
+    startBtn.classList.add('cancel');
+
+    interval = setInterval(() => {
+      remaining--;
+      display.textContent = fmt(remaining);
+      if (remaining <= 0) finish();
+    }, 1000);
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (running) {
+      reset();
+    } else if (pivot.classList.contains('fallen')) {
+      reset();
+    } else {
+      start();
+    }
+  });
+
+  // Init
+  display.textContent = fmt(totalSeconds);
+  syncInputs();
+})();
+</script>
+</body>
+</html>
