@@ -38,7 +38,6 @@
     letter-spacing: 0.05em;
   }
 
-  /* ---- Timer Display ---- */
   #timer-display {
     font-size: 3.2rem;
     font-variant-numeric: tabular-nums;
@@ -48,162 +47,23 @@
     min-height: 3.8rem;
   }
 
-  /* ---- Dreidel Scene ---- */
-  #scene {
-    width: 220px;
-    height: 320px;
-    perspective: 600px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  #dreidel-canvas {
     flex-shrink: 0;
   }
 
-  #dreidel-pivot {
-    transform-style: preserve-3d;
-    transition: transform 1.2s cubic-bezier(.4, 0, .2, 1);
+  #finished-banner {
+    display: none;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    animation: pulse 0.6s ease-in-out infinite alternate;
+    min-height: 2rem;
   }
+  #finished-banner.show { display: block; }
+  @keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
 
-  #dreidel-pivot.fallen {
-    transform: rotateZ(95deg) translateY(60px) translateX(30px);
-  }
+  .spacer { flex: 1; min-height: 4px; max-height: 24px; }
 
-  #dreidel-group {
-    transform-style: preserve-3d;
-    animation: none;
-  }
-
-  #dreidel-group.spinning {
-    animation: spin 0.7s linear infinite;
-  }
-
-  #dreidel-group.slowing {
-    animation: spin 2s cubic-bezier(.4, .0, .8, 1) forwards;
-  }
-
-  @keyframes spin {
-    from { transform: rotateY(0deg); }
-    to   { transform: rotateY(360deg); }
-  }
-
-  /* 3D dreidel built with CSS */
-  .dreidel-3d {
-    transform-style: preserve-3d;
-    position: relative;
-    width: 100px;
-    height: 240px;
-  }
-
-  /* --- Handle (top cylinder approximated as box) --- */
-  .handle {
-    position: absolute;
-    width: 18px;
-    height: 50px;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    transform-style: preserve-3d;
-  }
-  .handle .face {
-    position: absolute;
-    background: linear-gradient(180deg, #d4a84b, #b8872a);
-    border: 1px solid #9a6f1a;
-  }
-  .handle .front  { width: 18px; height: 50px; transform: translateZ(9px); }
-  .handle .back   { width: 18px; height: 50px; transform: translateZ(-9px) rotateY(180deg); }
-  .handle .left   { width: 18px; height: 50px; left: -9px; transform: translateX(9px) rotateY(-90deg); }
-  .handle .right  { width: 18px; height: 50px; left: 9px;  transform: translateX(-9px) rotateY(90deg); }
-  .handle .top    { width: 18px; height: 18px; top: -1px;  transform: rotateX(90deg) translateZ(0px); background: linear-gradient(135deg, #e2c06a, #c8961e); border-radius: 3px; }
-
-  /* --- Body (cube) --- */
-  .body {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    top: 50px;
-    left: 0;
-    transform-style: preserve-3d;
-  }
-  .body .face {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    font-weight: bold;
-    color: #1a1040;
-    border: 1.5px solid #9a6f1a;
-    background: linear-gradient(160deg, #e8c965, #c89520);
-    backface-visibility: visible;
-  }
-  .body .front  { transform: translateZ(50px); }
-  .body .back   { transform: translateZ(-50px) rotateY(180deg); }
-  .body .left   { transform: translateX(-50px) rotateY(-90deg); }
-  .body .right  { transform: translateX(50px) rotateY(90deg); }
-  .body .top    { height: 100px; transform: translateY(-50px) rotateX(90deg); background: linear-gradient(135deg, #edd87a, #c8961e); font-size: 0; }
-  .body .bottom { height: 100px; transform: translateY(50px) rotateX(-90deg); background: linear-gradient(135deg, #b88520, #9a6f1a); font-size: 0; }
-
-  /* Hebrew letters on each face — נ (Nun), ג (Gimel), ה (Hey), ש (Shin) */
-  .body .front::after  { content: "נ"; }
-  .body .right::after  { content: "ג"; }
-  .body .back::after   { content: "ה"; }
-  .body .left::after   { content: "ש"; }
-
-  /* --- Point (pyramid bottom) --- */
-  .point {
-    position: absolute;
-    width: 100px;
-    height: 0;
-    top: 150px;
-    left: 0;
-    transform-style: preserve-3d;
-  }
-
-  /* Each pyramid face: triangle via clip-path, hinged at top edge */
-  .point .tri {
-    position: absolute;
-    width: 100px;
-    height: 103px; /* slant height: sqrt(50² + 90²) */
-    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-    transform-origin: top center;
-    backface-visibility: visible;
-  }
-
-  .point .tri-front {
-    background: linear-gradient(180deg, #d4a84b, #b89025);
-    transform: translateZ(50px) rotateX(29.05deg);
-  }
-  .point .tri-back {
-    background: linear-gradient(180deg, #b08018, #96690f);
-    transform: rotateY(180deg) translateZ(50px) rotateX(29.05deg);
-  }
-  .point .tri-left {
-    background: linear-gradient(180deg, #c89520, #a67c15);
-    transform: rotateY(-90deg) translateZ(50px) rotateX(29.05deg);
-  }
-  .point .tri-right {
-    background: linear-gradient(180deg, #ba8c1e, #a07515);
-    transform: rotateY(90deg) translateZ(50px) rotateX(29.05deg);
-  }
-
-  /* ---- Shadow ---- */
-  #shadow {
-    width: 100px;
-    height: 20px;
-    background: radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%);
-    border-radius: 50%;
-    margin-top: -10px;
-    transition: all 1.2s ease;
-  }
-  #shadow.fallen {
-    width: 160px;
-    transform: translateX(30px);
-    opacity: 0.5;
-  }
-
-  /* ---- Controls ---- */
   #controls {
     display: flex;
     flex-direction: column;
@@ -243,7 +103,6 @@
     align-items: center;
     gap: 6px;
   }
-
   .custom-row label { color: var(--text-dim); font-size: 0.85rem; }
 
   .time-input {
@@ -275,66 +134,15 @@
   }
   #start-btn:active { opacity: 0.8; }
   #start-btn.cancel { background: #c0392b; color: #fff; }
-
-  /* ---- Finished banner ---- */
-  #finished-banner {
-    display: none;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent);
-    animation: pulse 0.6s ease-in-out infinite alternate;
-  }
-  #finished-banner.show { display: block; }
-  @keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
-
-  /* Layout spacing helper */
-  .spacer { flex: 1; min-height: 4px; max-height: 24px; }
 </style>
 </head>
 <body>
 
 <h1>Dreidel Timer</h1>
-
 <div id="timer-display">0:00</div>
-
-<div id="scene">
-  <div id="dreidel-pivot">
-    <div id="dreidel-group">
-      <div class="dreidel-3d">
-        <!-- Handle -->
-        <div class="handle">
-          <div class="face front"></div>
-          <div class="face back"></div>
-          <div class="face left"></div>
-          <div class="face right"></div>
-          <div class="face top"></div>
-        </div>
-        <!-- Body -->
-        <div class="body">
-          <div class="face front"></div>
-          <div class="face back"></div>
-          <div class="face left"></div>
-          <div class="face right"></div>
-          <div class="face top"></div>
-          <div class="face bottom"></div>
-        </div>
-        <!-- Point -->
-        <div class="point">
-          <div class="tri tri-front"></div>
-          <div class="tri tri-back"></div>
-          <div class="tri tri-left"></div>
-          <div class="tri tri-right"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div id="shadow"></div>
-
+<canvas id="dreidel-canvas" width="440" height="580"></canvas>
 <div id="finished-banner">Time's Up!</div>
-
 <div class="spacer"></div>
-
 <div id="controls">
   <div class="preset-row">
     <button class="preset-btn" data-sec="30">0:30</button>
@@ -352,22 +160,256 @@
   </div>
   <button id="start-btn">Start</button>
 </div>
-
 <div class="spacer"></div>
 
 <script>
 (() => {
   const $ = id => document.getElementById(id);
-  const display  = $('timer-display');
-  const group    = $('dreidel-group');
-  const pivot    = $('dreidel-pivot');
-  const shadow   = $('shadow');
-  const startBtn = $('start-btn');
-  const banner   = $('finished-banner');
-  const inputMin = $('input-min');
-  const inputSec = $('input-sec');
-  const presets  = document.querySelectorAll('.preset-btn');
+  const canvas  = $('dreidel-canvas');
+  const ctx     = canvas.getContext('2d');
+  const display = $('timer-display');
+  const startBtn= $('start-btn');
+  const banner  = $('finished-banner');
+  const inputMin= $('input-min');
+  const inputSec= $('input-sec');
+  const presets = document.querySelectorAll('.preset-btn');
 
+  // Hi-DPI
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = 440 * dpr;
+  canvas.height = 580 * dpr;
+  canvas.style.width  = '220px';
+  canvas.style.height = '290px';
+  ctx.scale(dpr, dpr);
+  const CW = 220, CH = 290;
+
+  // ---- 3D geometry ----
+  // Dreidel centered at origin. Y-up is negative (canvas convention: +Y down).
+  // Handle: box, Body: cube, Point: pyramid
+
+  // Handle vertices (narrow box)
+  const S = 50; // half-size of body cube
+  const HS = 9; // half-size of handle
+  const HT = -S - 50; // handle top y (above body)
+  const HB = -S;      // handle bottom y
+  const handleVerts = [
+    [-HS, HT,  HS], [ HS, HT,  HS], [ HS, HB,  HS], [-HS, HB,  HS], // front
+    [ HS, HT, -HS], [-HS, HT, -HS], [-HS, HB, -HS], [ HS, HB, -HS], // back
+  ];
+  const handleFaces = [
+    { v: [0,1,2,3], base: '#d4a84b', dark: '#b8872a' }, // front
+    { v: [4,5,6,7], base: '#b8872a', dark: '#9a6f1a' }, // back
+    { v: [5,0,3,6], base: '#c49030', dark: '#a67818' }, // left
+    { v: [1,4,7,2], base: '#c49030', dark: '#a67818' }, // right
+    { v: [5,4,1,0], base: '#e2c06a', dark: '#c8961e' }, // top
+  ];
+
+  // Body cube vertices
+  const bodyVerts = [
+    [-S, -S,  S], [ S, -S,  S], [ S,  S,  S], [-S,  S,  S], // front
+    [ S, -S, -S], [-S, -S, -S], [-S,  S, -S], [ S,  S, -S], // back
+  ];
+  const letters = ['נ', 'ג', 'ה', 'ש']; // front, right, back, left
+  const bodyFaces = [
+    { v: [0,1,2,3], base: '#e8c965', dark: '#c89520', letter: 'נ' }, // front
+    { v: [1,4,7,2], base: '#dbb840', dark: '#b88518', letter: 'ג' }, // right
+    { v: [4,5,6,7], base: '#c89520', dark: '#a67c15', letter: 'ה' }, // back
+    { v: [5,0,3,6], base: '#dbb840', dark: '#b88518', letter: 'ש' }, // left
+    { v: [5,4,1,0], base: '#edd87a', dark: '#c8961e' },              // top
+    { v: [3,2,7,6], base: '#b88520', dark: '#9a6f1a' },              // bottom
+  ];
+
+  // Point pyramid vertices
+  const PH = 90; // pyramid height
+  const pointVerts = [
+    [-S,  S,  S], [ S,  S,  S], [ S,  S, -S], [-S,  S, -S], // base (= body bottom)
+    [ 0,  S + PH,  0], // apex
+  ];
+  const pointFaces = [
+    { v: [0,1,4], base: '#d4a84b', dark: '#b89025' }, // front
+    { v: [1,2,4], base: '#ba8c1e', dark: '#9a7515' }, // right
+    { v: [2,3,4], base: '#b08018', dark: '#8a6510' }, // back
+    { v: [3,0,4], base: '#c89520', dark: '#a67c15' }, // left
+  ];
+
+  // ---- 3D math ----
+  function rotY(v, a) {
+    const c = Math.cos(a), s = Math.sin(a);
+    return [v[0]*c + v[2]*s, v[1], -v[0]*s + v[2]*c];
+  }
+  function rotZ(v, a) {
+    const c = Math.cos(a), s = Math.sin(a);
+    return [v[0]*c - v[1]*s, v[0]*s + v[1]*c, v[2]];
+  }
+  function rotX(v, a) {
+    const c = Math.cos(a), s = Math.sin(a);
+    return [v[0], v[1]*c - v[2]*s, v[1]*s + v[2]*c];
+  }
+
+  // Perspective project: returns [sx, sy]
+  const PERSP = 500;
+  function project(v) {
+    const scale = PERSP / (PERSP + v[2]);
+    return [CW/2 + v[0] * scale, CH/2 + v[1] * scale];
+  }
+
+  // Face normal Z after projection (for back-face culling & lighting)
+  function faceNormalZ(projected) {
+    const a = projected[0], b = projected[1], c = projected[2];
+    return (b[0]-a[0])*(c[1]-a[1]) - (b[1]-a[1])*(c[0]-a[0]);
+  }
+
+  // Average Z depth of transformed vertices
+  function avgZ(verts, indices) {
+    let sum = 0;
+    for (const i of indices) sum += verts[i][2];
+    return sum / indices.length;
+  }
+
+  // ---- Draw ----
+  function drawDreidel(angleY, tiltZ, offsetX, offsetY) {
+    ctx.clearRect(0, 0, CW, CH);
+
+    // Transform all vertex sets
+    function xform(v) {
+      let p = rotY(v, angleY);
+      if (tiltZ) p = rotZ(p, tiltZ);
+      return [p[0] + offsetX, p[1] + offsetY, p[2]];
+    }
+
+    const hVerts = handleVerts.map(xform);
+    const bVerts = bodyVerts.map(xform);
+    const pVerts = pointVerts.map(xform);
+
+    // Collect all faces with depth info
+    const allFaces = [];
+    function addFaces(faces, verts, group) {
+      for (const f of faces) {
+        const proj = f.v.map(i => project(verts[i]));
+        const nz = faceNormalZ(proj);
+        if (nz > 0) continue; // back-face cull (CW winding = front when nz < 0)
+        allFaces.push({
+          proj, f, depth: avgZ(verts, f.v), group
+        });
+      }
+    }
+    addFaces(handleFaces, hVerts, 'handle');
+    addFaces(bodyFaces, bVerts, 'body');
+    addFaces(pointFaces, pVerts, 'point');
+
+    // Painter's algorithm: draw far to near
+    allFaces.sort((a, b) => b.depth - a.depth);
+
+    for (const { proj, f, group } of allFaces) {
+      // Lighting: use normal z for shading
+      const nz = faceNormalZ(proj);
+      const brightness = Math.min(1, Math.max(0.3, -nz / 8000));
+
+      ctx.beginPath();
+      ctx.moveTo(proj[0][0], proj[0][1]);
+      for (let i = 1; i < proj.length; i++) ctx.lineTo(proj[i][0], proj[i][1]);
+      ctx.closePath();
+
+      // Interpolate between dark and base color based on brightness
+      ctx.fillStyle = brightness > 0.6 ? f.base : f.dark;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(100, 70, 20, 0.4)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+
+      // Draw Hebrew letter on body faces
+      if (f.letter && group === 'body') {
+        const cx = proj.reduce((s, p) => s + p[0], 0) / proj.length;
+        const cy = proj.reduce((s, p) => s + p[1], 0) / proj.length;
+        // Estimate face size for font scaling
+        const dx = proj[1][0] - proj[0][0];
+        const dy = proj[1][1] - proj[0][1];
+        const edgeLen = Math.sqrt(dx*dx + dy*dy);
+        const fontSize = Math.max(12, edgeLen * 0.55);
+        ctx.save();
+        ctx.font = `bold ${fontSize}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(20, 10, 50, 0.85)';
+        ctx.fillText(f.letter, cx, cy);
+        ctx.restore();
+      }
+    }
+
+    // Shadow
+    const shadowY = CH/2 + (S + PH) * (PERSP / (PERSP + 0)) + 8 + offsetY;
+    const shadowW = 50 + Math.abs(offsetX) * 0.5;
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(CW/2 + offsetX * 0.5, Math.min(shadowY, CH - 10), shadowW, 8, 0, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ---- Animation state ----
+  let spinAngle = 0;
+  let spinSpeed = 0;       // rad/s
+  let state = 'idle';      // idle | spinning | slowing | fallen
+  let fallProgress = 0;    // 0..1
+  let slowStart = 0;
+  let animId = null;
+  let lastTime = 0;
+
+  const SPIN_SPEED = 8;    // rad/s when running
+  const SLOW_DURATION = 1800; // ms to slow down
+  const FALL_DURATION = 800;  // ms to fall over
+
+  function animate(ts) {
+    if (!lastTime) lastTime = ts;
+    const dt = (ts - lastTime) / 1000;
+    lastTime = ts;
+
+    let tiltZ = 0, offX = 0, offY = 0;
+
+    if (state === 'spinning') {
+      spinAngle += SPIN_SPEED * dt;
+    } else if (state === 'slowing') {
+      const elapsed = ts - slowStart;
+      const t = Math.min(1, elapsed / SLOW_DURATION);
+      // Ease-out deceleration
+      const speed = SPIN_SPEED * (1 - t * t);
+      spinAngle += speed * dt;
+      if (t >= 1) {
+        state = 'falling';
+        slowStart = ts;
+      }
+    } else if (state === 'falling') {
+      const elapsed = ts - slowStart;
+      fallProgress = Math.min(1, elapsed / FALL_DURATION);
+      // Ease-in-out
+      const t = fallProgress < 0.5
+        ? 2 * fallProgress * fallProgress
+        : 1 - Math.pow(-2 * fallProgress + 2, 2) / 2;
+      tiltZ = t * 1.45; // ~83 degrees
+      offX = t * 25;
+      offY = t * 30;
+      if (fallProgress >= 1) {
+        state = 'fallen';
+        banner.classList.add('show');
+        startBtn.textContent = 'Reset';
+        startBtn.classList.remove('cancel');
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+      }
+    } else if (state === 'fallen') {
+      tiltZ = 1.45;
+      offX = 25;
+      offY = 30;
+    }
+
+    drawDreidel(spinAngle, tiltZ, offX, offY);
+    animId = requestAnimationFrame(animate);
+  }
+
+  // Start render loop
+  animId = requestAnimationFrame(animate);
+
+  // ---- Timer logic ----
   let totalSeconds = 60;
   let remaining = 0;
   let interval = null;
@@ -389,11 +431,9 @@
     const s = Math.max(0, Math.min(59, parseInt(inputSec.value) || 0));
     totalSeconds = m * 60 + s;
     if (totalSeconds < 1) totalSeconds = 1;
-    // deselect presets
     presets.forEach(b => b.classList.remove('active'));
   }
 
-  // Preset buttons
   presets.forEach(btn => {
     btn.addEventListener('click', () => {
       if (running) return;
@@ -405,7 +445,6 @@
     });
   });
 
-  // Custom input changes
   inputMin.addEventListener('change', () => { if (!running) { readInputs(); display.textContent = fmt(totalSeconds); } });
   inputSec.addEventListener('change', () => { if (!running) { readInputs(); display.textContent = fmt(totalSeconds); } });
 
@@ -413,9 +452,9 @@
     clearInterval(interval);
     interval = null;
     running = false;
-    group.classList.remove('spinning', 'slowing');
-    pivot.classList.remove('fallen');
-    shadow.classList.remove('fallen');
+    state = 'idle';
+    spinAngle = 0;
+    fallProgress = 0;
     banner.classList.remove('show');
     startBtn.textContent = 'Start';
     startBtn.classList.remove('cancel');
@@ -427,22 +466,8 @@
     interval = null;
     running = false;
     display.textContent = '0:00';
-
-    // Slow-down then fall
-    group.classList.remove('spinning');
-    group.classList.add('slowing');
-
-    setTimeout(() => {
-      group.classList.remove('slowing');
-      pivot.classList.add('fallen');
-      shadow.classList.add('fallen');
-      banner.classList.add('show');
-      startBtn.textContent = 'Reset';
-      startBtn.classList.remove('cancel');
-
-      // Vibrate if available
-      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
-    }, 1600);
+    state = 'slowing';
+    slowStart = performance.now();
   }
 
   function start() {
@@ -450,11 +475,9 @@
     remaining = totalSeconds;
     display.textContent = fmt(remaining);
     running = true;
+    state = 'spinning';
     banner.classList.remove('show');
-    pivot.classList.remove('fallen');
-    shadow.classList.remove('fallen');
-    group.classList.remove('slowing');
-    group.classList.add('spinning');
+    fallProgress = 0;
     startBtn.textContent = 'Cancel';
     startBtn.classList.add('cancel');
 
@@ -468,14 +491,13 @@
   startBtn.addEventListener('click', () => {
     if (running) {
       reset();
-    } else if (pivot.classList.contains('fallen')) {
+    } else if (state === 'fallen') {
       reset();
     } else {
       start();
     }
   });
 
-  // Init
   display.textContent = fmt(totalSeconds);
   syncInputs();
 })();
