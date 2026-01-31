@@ -155,40 +155,37 @@
   .point {
     position: absolute;
     width: 100px;
-    height: 90px;
+    height: 0;
     top: 150px;
     left: 0;
     transform-style: preserve-3d;
   }
 
+  /* Each pyramid face: triangle via clip-path, hinged at top edge */
   .point .tri {
     position: absolute;
-    width: 0; height: 0;
-    border-left: 50px solid transparent;
-    border-right: 50px solid transparent;
-    border-top: 90px solid #c89520;
+    width: 100px;
+    height: 103px; /* slant height: sqrt(50² + 90²) */
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
     transform-origin: top center;
+    backface-visibility: visible;
   }
 
   .point .tri-front {
-    transform: translateZ(50px) translateX(0px);
-    border-top-color: #d4a84b;
+    background: linear-gradient(180deg, #d4a84b, #b89025);
+    transform: translateZ(50px) rotateX(29.05deg);
   }
   .point .tri-back {
-    transform: translateZ(-50px) rotateY(180deg);
-    border-top-color: #b08018;
+    background: linear-gradient(180deg, #b08018, #96690f);
+    transform: rotateY(180deg) translateZ(50px) rotateX(29.05deg);
   }
   .point .tri-left {
-    left: 0;
-    transform: translateX(-50px) rotateY(-90deg) translateX(50px);
-    transform-origin: top left;
-    border-top-color: #c89520;
+    background: linear-gradient(180deg, #c89520, #a67c15);
+    transform: rotateY(-90deg) translateZ(50px) rotateX(29.05deg);
   }
   .point .tri-right {
-    right: 0;
-    transform: translateX(50px) rotateY(90deg) translateX(-50px);
-    transform-origin: top right;
-    border-top-color: #ba8c1e;
+    background: linear-gradient(180deg, #ba8c1e, #a07515);
+    transform: rotateY(90deg) translateZ(50px) rotateX(29.05deg);
   }
 
   /* ---- Shadow ---- */
