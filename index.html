@@ -156,18 +156,21 @@
     position: absolute;
     width: 100px;
     height: 0;
-    top: 150px;
+    top: 149.5px; /* 0.5px overlap with body bottom to prevent horizontal seam */
     left: 0;
     transform-style: preserve-3d;
   }
 
-  /* Each pyramid face: triangle via clip-path, hinged at top edge */
+  /* Each pyramid face: triangle via clip-path, hinged at top edge.
+     Slightly oversized (+2px width, +1px height) to eliminate seam gaps
+     between adjacent faces during 3D rotation. */
   .point .tri {
     position: absolute;
-    width: 100px;
-    height: 103px; /* slant height: sqrt(50² + 90²) */
+    width: 104px;
+    left: -2px;
+    height: 105px; /* slant height ~103px + 2px overlap */
     clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-    transform-origin: top center;
+    transform-origin: 52px 0; /* center of 104px width, at top edge */
     backface-visibility: visible;
   }
 
